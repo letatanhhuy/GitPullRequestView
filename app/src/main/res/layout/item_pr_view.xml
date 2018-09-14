@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             android:layout_width="match_parent"
+                                             android:layout_height="wrap_content"
+                                             android:id="@+id/layoutContactItem">
+
+    <ImageView
+        android:id="@+id/imgPr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/txtPrName"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:textSize="20dp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:text="PR name can redsadally really really long"
+        app:layout_constraintStart_toEndOf="@id/imgPr"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:id="@+id/txtPrBody"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:textSize="15sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:text="PR description can be really really really really really really really really really long PR description can be really really really really really really really really really long "
+        app:layout_constraintLeft_toRightOf="@id/imgPr"
+        app:layout_constraintTop_toBottomOf="@id/txtPrName"
+        app:layout_constraintStart_toEndOf="@id/imgPr"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</android.support.constraint.ConstraintLayout>
