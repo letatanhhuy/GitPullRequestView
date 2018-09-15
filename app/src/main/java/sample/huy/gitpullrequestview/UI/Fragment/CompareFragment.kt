@@ -1,6 +1,7 @@
 package sample.huy.gitpullrequestview.UI.Fragment
 
 import android.app.ProgressDialog
+import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
@@ -95,17 +96,39 @@ class CompareFragment:Fragment() , PrFileRecycleAdapter.ItemClickListener {
         if (dataArrayList.size > 0) {
             updateCompareView(0)
         } else {
-            var combineTextView = view?.findViewById<TextView>(R.id.txtContentCombine)
-            combineTextView?.text = "No file change in this PR"
+
         }
     }
     private fun updateCompareView(fileIndex:Int) {
-        var combineTextView = view?.findViewById<TextView>(R.id.txtContentCombine)
-        combineTextView?.text = dataArrayList.get(fileIndex).differences
+        if (isLandscapeMode()) {
+            var originTextView = view?.findViewById<TextView>(R.id.txtContentOrigin)
+            var newTextView = view?.findViewById<TextView>(R.id.txtContentNew)
+            if(fileIndex >= 0) {
+                originTextView?.text = dataArrayList.get(fileIndex).differences
+                newTextView?.text = dataArrayList.get(fileIndex).differences
+            } else {
+                originTextView?.text = getString(R.string.empty_content)
+                newTextView?.text = getString(R.string.empty_content)
+            }
+        } else {
+            var combineTextView = view?.findViewById<TextView>(R.id.txtContentCombine)
+            if(fileIndex >= 0) {
+                combineTextView?.text = dataArrayList.get(fileIndex).differences
+            } else {
+                combineTextView?.text = getString(R.string.empty_content)
+            }
+        }
+
+    }
+
+    private fun isLandscapeMode():Boolean {
+        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
     }
 
     override fun onItemClick(view: View, fileIndex: Int) {
         Log.d(TAG, "onItemClick file index:" + fileIndex)
         updateCompareView(fileIndex)
     }
+
+
 }

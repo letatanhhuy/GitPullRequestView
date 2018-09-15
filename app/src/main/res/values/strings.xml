@@ -3,4 +3,5 @@
     <string name="pull_request_title">Pull Resquest List</string>
     <string name="loading_text">Loading....</string>
     <string name="loading_fail">Something went wrong...Please try later!.</string>
+    <string name="empty_content">Nothing to show.</string>
 </resources>
