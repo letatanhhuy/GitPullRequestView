@@ -56,6 +56,6 @@ internal constructor(context: Context?, private val mData: List<PullRequest>)
     }
 
     interface ItemClickListener {
-        fun onItemClick(view: View, id: Int)
+        fun onItemClick(view: View, position: Int)
     }
 }

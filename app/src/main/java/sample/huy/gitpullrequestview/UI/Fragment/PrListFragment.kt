@@ -68,12 +68,12 @@ class PrListFragment : Fragment() , PrRecycleAdapter.ItemClickListener {
         call.enqueue(object : Callback<List<PullRequest>> {
             override fun onResponse(call: Call<List<PullRequest>>, response: Response<List<PullRequest>>) {
                 dataArrayList.clear()
-                progressDialog.dismiss()
                 for (pr in response.body().orEmpty()) {
                     dataArrayList.add(pr)
                 }
                 Log.d(TAG, "fetch data success size of PR list:" + dataArrayList.size)
                 recycleViewPrListAdapter.notifyDataSetChanged()
+                progressDialog.dismiss()
             }
 
             override fun onFailure(call: Call<List<PullRequest>>, t: Throwable) {
