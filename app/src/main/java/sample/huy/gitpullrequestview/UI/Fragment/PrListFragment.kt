@@ -2,12 +2,11 @@ package sample.huy.gitpullrequestview.UI.Fragment
 
 import android.app.ProgressDialog
 import android.content.Context
-import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +14,7 @@ import android.widget.Toast
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import sample.huy.gitpullrequestview.Constant.ConfigurationValue
 import sample.huy.gitpullrequestview.DaggerInjector.DaggerRetrofitProviderInterface
 import sample.huy.gitpullrequestview.DaggerInjector.RetroFitProvider
 import sample.huy.gitpullrequestview.Entity.PullRequest
@@ -37,18 +37,27 @@ class PrListFragment : Fragment() , PrRecycleAdapter.ItemClickListener {
     lateinit var retroFitObj: RetroFitProvider
 
     companion object {
+        private val TAG = "GPT-PrListFragment"
         fun newInstance(): PrListFragment {
             return PrListFragment()
         }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        Log.d(TAG, "onCreateView")
         createLoadingScreen()
         return initUI(inflater?.inflate(R.layout.list_pr_view, container, false))
     }
 
     override fun onAttach(context: Context?) {
+        Log.d(TAG, "onAttach")
         super.onAttach(context)
+        fetchDataPullRequest()
+    }
+
+    override fun onResume() {
+        Log.d(TAG, "onResume")
+        super.onResume()
         fetchDataPullRequest()
     }
 
@@ -63,12 +72,14 @@ class PrListFragment : Fragment() , PrRecycleAdapter.ItemClickListener {
                 for (pr in response.body().orEmpty()) {
                     dataArrayList.add(pr)
                 }
+                Log.d(TAG, "fetch data success size of PR list:" + dataArrayList.size)
                 recycleViewPrListAdapter.notifyDataSetChanged()
             }
 
             override fun onFailure(call: Call<List<PullRequest>>, t: Throwable) {
                 progressDoalog.dismiss()
                 Toast.makeText(activity, getString(R.string.loading_fail), Toast.LENGTH_SHORT).show()
+                Log.e(TAG, "fetch data failed error:" + t.message)
             }
         })
     }
@@ -91,6 +102,16 @@ class PrListFragment : Fragment() , PrRecycleAdapter.ItemClickListener {
     }
 
     override fun onItemClick(view: View, position: Int) {
-        Toast.makeText(activity, "Click on " + recycleViewPrListAdapter.getItem(position).title, Toast.LENGTH_SHORT).show()
+        val compareFragment = CompareFragment()
+
+        val arguments = Bundle()
+        arguments.putInt(ConfigurationValue.PR_INDEX, position)
+        compareFragment.arguments = arguments
+
+        activity?.supportFragmentManager!!
+                .beginTransaction()
+                .replace(R.id.main_layout, compareFragment, "Pull Request Diff")
+                .addToBackStack(null)
+                .commit()
     }
 }
