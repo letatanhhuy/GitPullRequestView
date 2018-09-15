@@ -24,6 +24,9 @@ import sample.huy.gitpullrequestview.R
 import sample.huy.gitpullrequestview.UI.DiffSupporter
 import sample.huy.gitpullrequestview.UI.RecycleAdapter.PrFileRecycleAdapter
 import javax.inject.Inject
+import android.text.method.ScrollingMovementMethod
+
+
 
 class CompareFragment:Fragment() , PrFileRecycleAdapter.ItemClickListener {
     private var curPRIndex = -1
@@ -74,8 +77,8 @@ class CompareFragment:Fragment() , PrFileRecycleAdapter.ItemClickListener {
             override fun onResponse(call: Call<List<PullRequestFile>>, response: Response<List<PullRequestFile>>) {
                 dataArrayList.clear()
                 for (file in response.body().orEmpty()) {
-                    file.differences = DiffSupporter.processPullRequestFileDiff(file.differences)
-                    dataArrayList.add(file)
+                    var prFile = DiffSupporter.processPullRequestFileDiff(file)
+                    dataArrayList.add(prFile)
                 }
                 recycleViewPrFileListAdapter.notifyDataSetChanged()
                 Log.d(TAG, "fetch data success size of PR file list:" + dataArrayList.size)
@@ -110,9 +113,13 @@ class CompareFragment:Fragment() , PrFileRecycleAdapter.ItemClickListener {
         if (isLandscapeMode()) {
             var originTextView = view?.findViewById<TextView>(R.id.txtContentOrigin)
             var newTextView = view?.findViewById<TextView>(R.id.txtContentNew)
+            originTextView?.setHorizontallyScrolling(true)
+            originTextView?.movementMethod = ScrollingMovementMethod()
+            newTextView?.setHorizontallyScrolling(true)
+            newTextView?.movementMethod = ScrollingMovementMethod()
             if(fileIndex >= 0) {
-                originTextView?.text = dataArrayList.get(fileIndex).differences
-                newTextView?.text = dataArrayList.get(fileIndex).differences
+                originTextView?.text = DiffSupporter.fromHtml(dataArrayList.get(fileIndex).originContent!!)
+                newTextView?.text = DiffSupporter.fromHtml(dataArrayList.get(fileIndex).newContent!!)
             } else {
                 originTextView?.text = getString(R.string.empty_content)
                 newTextView?.text = getString(R.string.empty_content)
