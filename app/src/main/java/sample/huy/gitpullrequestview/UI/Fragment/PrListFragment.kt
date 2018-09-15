@@ -20,12 +20,12 @@ import sample.huy.gitpullrequestview.DaggerInjector.RetroFitProvider
 import sample.huy.gitpullrequestview.Entity.PullRequest
 import sample.huy.gitpullrequestview.Network.NetworkServices
 import sample.huy.gitpullrequestview.R
-import sample.huy.gitpullrequestview.UI.PrRecycleAdapter
+import sample.huy.gitpullrequestview.UI.RecycleAdapter.PrRecycleAdapter
 import javax.inject.Inject
 
 class PrListFragment : Fragment() , PrRecycleAdapter.ItemClickListener {
     //UI
-    private lateinit var progressDoalog: ProgressDialog
+    private lateinit var progressDialog: ProgressDialog
     private lateinit var recycleViewPrList: RecyclerView
     private lateinit var recycleViewPrListAdapter: PrRecycleAdapter
 
@@ -45,7 +45,7 @@ class PrListFragment : Fragment() , PrRecycleAdapter.ItemClickListener {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Log.d(TAG, "onCreateView")
-        createLoadingScreen()
+        createLoadingScreen();
         return initUI(inflater?.inflate(R.layout.list_pr_view, container, false))
     }
 
@@ -58,17 +58,17 @@ class PrListFragment : Fragment() , PrRecycleAdapter.ItemClickListener {
     override fun onResume() {
         Log.d(TAG, "onResume")
         super.onResume()
-        fetchDataPullRequest()
     }
 
     private fun fetchDataPullRequest() {
+        progressDialog.show()
         DaggerRetrofitProviderInterface.create().getRetroFitProvider(this)
         val service: NetworkServices = retroFitObj.getRetrofitInstance().create(NetworkServices::class.java)
         val call = service.getAllPullRequests()
         call.enqueue(object : Callback<List<PullRequest>> {
             override fun onResponse(call: Call<List<PullRequest>>, response: Response<List<PullRequest>>) {
                 dataArrayList.clear()
-                progressDoalog.dismiss()
+                progressDialog.dismiss()
                 for (pr in response.body().orEmpty()) {
                     dataArrayList.add(pr)
                 }
@@ -77,7 +77,7 @@ class PrListFragment : Fragment() , PrRecycleAdapter.ItemClickListener {
             }
 
             override fun onFailure(call: Call<List<PullRequest>>, t: Throwable) {
-                progressDoalog.dismiss()
+                progressDialog.dismiss()
                 Toast.makeText(activity, getString(R.string.loading_fail), Toast.LENGTH_SHORT).show()
                 Log.e(TAG, "fetch data failed error:" + t.message)
             }
@@ -85,15 +85,12 @@ class PrListFragment : Fragment() , PrRecycleAdapter.ItemClickListener {
     }
 
     private fun createLoadingScreen() {
-        progressDoalog = ProgressDialog(this.activity)
-        progressDoalog.setMessage(getString(R.string.loading_text))
-        progressDoalog.show()
-
+        progressDialog = ProgressDialog(this.activity)
+        progressDialog.setMessage(getString(R.string.loading_text))
     }
 
     private fun initUI(view: View) : View{
         recycleViewPrList = view.findViewById(R.id.recycleViewPR) as RecyclerView
-//        recycleViewPrList.addItemDecoration(DividerItemDecoration(recycleViewPrList.getContext(), DividerItemDecoration.VERTICAL))
         recycleViewPrListAdapter = PrRecycleAdapter(activity, dataArrayList)
         recycleViewPrListAdapter.setClickListener(this)
         recycleViewPrList.adapter = recycleViewPrListAdapter
@@ -101,13 +98,12 @@ class PrListFragment : Fragment() , PrRecycleAdapter.ItemClickListener {
         return view
     }
 
-    override fun onItemClick(view: View, position: Int) {
+    override fun onItemClick(view: View, id: Int) {
         val compareFragment = CompareFragment()
 
         val arguments = Bundle()
-        arguments.putInt(ConfigurationValue.PR_INDEX, position)
+        arguments.putInt(ConfigurationValue.PR_INDEX, id)
         compareFragment.arguments = arguments
-
         activity?.supportFragmentManager!!
                 .beginTransaction()
                 .replace(R.id.main_layout, compareFragment, "Pull Request Diff")

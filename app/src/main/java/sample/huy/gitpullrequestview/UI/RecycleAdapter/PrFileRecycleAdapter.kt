@@ -1,4 +1,4 @@
-package sample.huy.gitpullrequestview.UI
+package sample.huy.gitpullrequestview.UI.RecycleAdapter
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
@@ -6,24 +6,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import sample.huy.gitpullrequestview.Entity.PullRequest
+import sample.huy.gitpullrequestview.Entity.PullRequestFile
 import sample.huy.gitpullrequestview.R
 
-open class PrRecycleAdapter
-internal constructor(context: Context?, private val mData: List<PullRequest>)
-    : RecyclerView.Adapter<PrRecycleAdapter.ViewHolder>() {
+open class PrFileRecycleAdapter
+internal constructor(context: Context?, private val mData: List<PullRequestFile>)
+    : RecyclerView.Adapter<PrFileRecycleAdapter.ViewHolder>() {
 
     private val mInflater: LayoutInflater = LayoutInflater.from(context)
     private var mClickListener: ItemClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = mInflater.inflate(R.layout.item_pr_view, parent, false)
+        val view = mInflater.inflate(R.layout.item_pr_file_view, parent, false)
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.txtPrName?.text = mData.get(position).title
-        holder.txtPrBody?.text = mData.get(position).body
+        holder.txtPrFileName?.text = mData.get(position).name
+        holder.txtPrFileStatus?.text = mData.get(position).status
     }
 
     override fun getItemCount(): Int {
@@ -31,9 +31,9 @@ internal constructor(context: Context?, private val mData: List<PullRequest>)
     }
 
     inner class ViewHolder internal constructor(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
-        internal var txtPrName: TextView? = itemView.findViewById(R.id.txtPrName)
-        internal var txtPrBody: TextView? = itemView.findViewById(R.id.txtPrBody)
-        private var layoutView: View? = itemView.findViewById(R.id.layoutContactItem)
+        internal var txtPrFileName: TextView? = itemView.findViewById(R.id.txtPrFileName)
+        internal var txtPrFileStatus: TextView? = itemView.findViewById(R.id.txtPrFileStatus)
+        private var layoutView: View? = itemView.findViewById(R.id.layoutPrFileItem)
 
         init {
             layoutView?.setOnClickListener(this)
@@ -46,7 +46,7 @@ internal constructor(context: Context?, private val mData: List<PullRequest>)
         }
     }
 
-    internal fun getItem(id: Int): PullRequest {
+    internal fun getItem(id: Int): PullRequestFile {
         return mData.get(id)
     }
 
