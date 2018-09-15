@@ -44,7 +44,7 @@ class CompareFragment:Fragment() , PrFileRecycleAdapter.ItemClickListener {
         curFileIndex = this.arguments?.get(ConfigurationValue.PR_INDEX) as Int
         Log.d(TAG, "onCreateView: pull request file index:" + curFileIndex)
         fetchDataPullRequestFile()
-        return initUI(inflater?.inflate(R.layout.list_pr_file_view, container, false))
+        return initUI(inflater?.inflate(R.layout.compare_pr_view, container, false))
     }
 
     override fun onStart() {

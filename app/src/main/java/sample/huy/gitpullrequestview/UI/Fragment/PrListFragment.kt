@@ -25,7 +25,7 @@ import javax.inject.Inject
 
 class PrListFragment : Fragment() , PrRecycleAdapter.ItemClickListener {
     //UI
-    private lateinit var progressDialog: ProgressDialog
+    private lateinit var progressDialog:ProgressDialog
     private lateinit var recycleViewPrList: RecyclerView
     private lateinit var recycleViewPrListAdapter: PrRecycleAdapter
 
@@ -45,7 +45,6 @@ class PrListFragment : Fragment() , PrRecycleAdapter.ItemClickListener {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Log.d(TAG, "onCreateView")
-        createLoadingScreen();
         return initUI(inflater?.inflate(R.layout.list_pr_view, container, false))
     }
 
@@ -61,6 +60,7 @@ class PrListFragment : Fragment() , PrRecycleAdapter.ItemClickListener {
     }
 
     private fun fetchDataPullRequest() {
+        progressDialog = ProgressDialog(this.activity)
         progressDialog.show()
         DaggerRetrofitProviderInterface.create().getRetroFitProvider(this)
         val service: NetworkServices = retroFitObj.getRetrofitInstance().create(NetworkServices::class.java)
@@ -82,11 +82,6 @@ class PrListFragment : Fragment() , PrRecycleAdapter.ItemClickListener {
                 Log.e(TAG, "fetch data failed error:" + t.message)
             }
         })
-    }
-
-    private fun createLoadingScreen() {
-        progressDialog = ProgressDialog(this.activity)
-        progressDialog.setMessage(getString(R.string.loading_text))
     }
 
     private fun initUI(view: View) : View{
