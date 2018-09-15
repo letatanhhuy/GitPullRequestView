@@ -21,6 +21,7 @@ import sample.huy.gitpullrequestview.DaggerInjector.RetroFitProvider
 import sample.huy.gitpullrequestview.Entity.PullRequestFile
 import sample.huy.gitpullrequestview.Network.NetworkServices
 import sample.huy.gitpullrequestview.R
+import sample.huy.gitpullrequestview.UI.DiffSupporter
 import sample.huy.gitpullrequestview.UI.RecycleAdapter.PrFileRecycleAdapter
 import javax.inject.Inject
 
@@ -55,6 +56,11 @@ class CompareFragment:Fragment() , PrFileRecycleAdapter.ItemClickListener {
         activity?.title = "Compare PR " + curPRIndex
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        super.onConfigurationChanged(newConfig)
+        updateCompareView()
+    }
+
     private fun fetchDataPullRequestFile() {
         if(curPRIndex == -1) {
             return
@@ -68,6 +74,7 @@ class CompareFragment:Fragment() , PrFileRecycleAdapter.ItemClickListener {
             override fun onResponse(call: Call<List<PullRequestFile>>, response: Response<List<PullRequestFile>>) {
                 dataArrayList.clear()
                 for (file in response.body().orEmpty()) {
+                    file.differences = DiffSupporter.processPullRequestFileDiff(file.differences)
                     dataArrayList.add(file)
                 }
                 recycleViewPrFileListAdapter.notifyDataSetChanged()
@@ -113,7 +120,7 @@ class CompareFragment:Fragment() , PrFileRecycleAdapter.ItemClickListener {
         } else {
             var combineTextView = view?.findViewById<TextView>(R.id.txtContentCombine)
             if(fileIndex >= 0) {
-                combineTextView?.text = dataArrayList.get(fileIndex).differences
+                combineTextView?.text = DiffSupporter.fromHtml(dataArrayList.get(fileIndex).differences!!)
             } else {
                 combineTextView?.text = getString(R.string.empty_content)
             }
