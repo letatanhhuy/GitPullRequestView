@@ -22,12 +22,16 @@ import sample.huy.gitpullrequestview.Network.NetworkServices
 import sample.huy.gitpullrequestview.R
 import sample.huy.gitpullrequestview.UI.RecycleAdapter.PrRecycleAdapter
 import javax.inject.Inject
+import android.support.v4.widget.SwipeRefreshLayout
+
+
 
 class PrListFragment : Fragment() , PrRecycleAdapter.ItemClickListener {
     //UI
     private lateinit var progressDialog:ProgressDialog
     private lateinit var recycleViewPrList: RecyclerView
     private lateinit var recycleViewPrListAdapter: PrRecycleAdapter
+    private lateinit var swipeContainer:SwipeRefreshLayout
 
     //Data
     private var dataArrayList = ArrayList<PullRequest>()
@@ -52,11 +56,13 @@ class PrListFragment : Fragment() , PrRecycleAdapter.ItemClickListener {
         Log.d(TAG, "onAttach")
         super.onAttach(context)
         fetchDataPullRequest()
+        activity?.title = "Pull request list"
     }
 
     override fun onResume() {
         Log.d(TAG, "onResume")
         super.onResume()
+        activity?.title = "Pull request list"
     }
 
     private fun fetchDataPullRequest() {
@@ -74,12 +80,18 @@ class PrListFragment : Fragment() , PrRecycleAdapter.ItemClickListener {
                 Log.d(TAG, "fetch data success size of PR list:" + dataArrayList.size)
                 recycleViewPrListAdapter.notifyDataSetChanged()
                 progressDialog.dismiss()
+                if (swipeContainer.isRefreshing) {
+                    swipeContainer.isRefreshing = false
+                }
             }
 
             override fun onFailure(call: Call<List<PullRequest>>, t: Throwable) {
                 progressDialog.dismiss()
                 Toast.makeText(activity, getString(R.string.loading_fail), Toast.LENGTH_SHORT).show()
                 Log.e(TAG, "fetch data failed error:" + t.message)
+                if (swipeContainer.isRefreshing) {
+                    swipeContainer.isRefreshing = false
+                }
             }
         })
     }
@@ -90,6 +102,10 @@ class PrListFragment : Fragment() , PrRecycleAdapter.ItemClickListener {
         recycleViewPrListAdapter.setClickListener(this)
         recycleViewPrList.adapter = recycleViewPrListAdapter
         recycleViewPrList.layoutManager = LinearLayoutManager(activity)
+        swipeContainer = view?.findViewById(R.id.swipePRList) as SwipeRefreshLayout
+        swipeContainer.setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener {
+            fetchDataPullRequest()
+        })
         return view
     }
 
