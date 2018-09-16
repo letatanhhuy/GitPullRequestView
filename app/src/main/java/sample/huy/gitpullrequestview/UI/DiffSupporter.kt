@@ -4,59 +4,92 @@ import android.text.Html
 import android.os.Build
 import android.text.Spanned
 import sample.huy.gitpullrequestview.Entity.PullRequestFile
+import sample.huy.gitpullrequestview.UI.diff_match_patch.Operation as Operation
 
 class DiffSupporter {
     companion object {
-        fun processPullRequestFileDiff(file:PullRequestFile):PullRequestFile {
+        fun processPullRequestFileDiff(file: PullRequestFile): PullRequestFile {
             var input = file.differences
             var diff = ""
             var origin = ""
             var new = ""
-            if(input != null && input.isNotEmpty()) {
+            var originForProcess = ""
+            var newForProcess = ""
+            if (input != null && input.isNotEmpty()) {
                 var lineArray: List<String> = input.split("\n")
                 for (s in lineArray) {
                     var firstChar = s[0]
                     var newString = s.drop(1)
                     when (firstChar) {
                         '+' -> {
-                            diff += addColor(s)
+                            //diff += addColor(s)
                             origin += newLine()
                             new += addColor(newString)
+                            //
+                            originForProcess += newLine()
+                            newForProcess += newString + newLine()
                         }
                         '-' -> {
-                            diff += removeColor(s)
+                            //diff += removeColor(s)
                             origin += removeColor(newString)
                             new += newLine()
+                            //
+                            originForProcess += newString + newLine()
+                            newForProcess += newLine()
                         }
                         ' ' -> {
-                            diff += noneColor(s)
+                            //diff += noneColor(s)
                             origin += noneColor(newString)
                             new += noneColor(newString)
+                            //
+                            originForProcess += newLine()
+                            newForProcess += newLine()
+
                         }
-                        else -> { // Note the block
-                            diff += noneColor(s)
-//                            origin += noneColor(newString)
-//                            new += noneColor(newString)
+                        else -> {
+                            //diff += noneColor(s)
                         }
                     }
                 }
             }
-            file.differences = diff
             file.originContent = origin
             file.newContent = new
+
+            //new try
+            var diffFactory = diff_match_patch()
+            var diffList = diffFactory.diff_main(originForProcess, newForProcess)
+            for (d in diffList) {
+                when (d.operation) {
+                    //add
+                    Operation.INSERT -> {
+                        diff += addColor(d.text, false)
+                    }
+                    Operation.DELETE -> {
+                        diff += removeColor(d.text, false)
+                    }
+                    Operation.EQUAL -> {
+                        diff += noneColor(d.text, false)
+                    }
+                }
+            }
+            file.differences = diff
             return file
         }
-        fun newLine(): String {
+
+        private fun newLine(): String {
             return "<br/>"
         }
-        fun removeColor(source: String): String {
-            return "<font color=#FF0000>" + source + "</font><br/>"
+
+        private fun removeColor(source: String, needNewLine: Boolean = true): String {
+            return if (needNewLine) "<font color=#FF0000>" + source + "</font><br/>" else "<font color=#FF0000>" + source + "</font>"
         }
-        fun addColor(source: String): String {
-            return "<font color=#008000>" + source + "</font><br/>"
+
+        private fun addColor(source: String, needNewLine: Boolean = true): String {
+            return if (needNewLine) "<font color=#008000>" + source + "</font><br/>" else "<font color=#008000>" + source + "</font>"
         }
-        fun noneColor(source: String): String {
-            return "<font color=#000000>" + source + "</font><br/>"
+
+        private fun noneColor(source: String, needNewLine: Boolean = true): String {
+            return if (needNewLine) "<font color=#000000>" + source + "</font><br/>" else "<font color=#000000>" + source + "</font>"
         }
 
         fun fromHtml(source: String): Spanned {

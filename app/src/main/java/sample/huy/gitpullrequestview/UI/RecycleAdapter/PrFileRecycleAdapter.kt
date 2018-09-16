@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import sample.huy.gitpullrequestview.Entity.PullRequestFile
 import sample.huy.gitpullrequestview.R
-import sample.huy.gitpullrequestview.UI.Fragment.CompareFragment
 
 open class PrFileRecycleAdapter
 internal constructor(context: Context?, private val mData: List<PullRequestFile>)
